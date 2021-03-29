@@ -76,7 +76,7 @@ sub-font
 
 
 .super-font, h1, h2, h3, .label + p {
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: 'Cantarell', sans-serif;
 }
 
 .sub-font, p, ul, li {
