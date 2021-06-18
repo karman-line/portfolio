@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Scrollama: Sticky Side Example</title>
+    <meta name="description" content="Scrollama: Sticky Side Example" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      #scrolly {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        background-color: #f3f3f3;
+        padding: 1rem;
+        text-align: justify;
+      }
+
+      #scrolly > * {
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+      }
+
+      article {
+        position: relative;
+        padding: 0 1rem;
+        max-width: 20rem;
+      }
+
+      .sticky-thing {
+        position: -webkit-sticky;
+        position: sticky;
+        width: 100%;
+        margin: 0;
+        background-color: #8a8a8a;
+        background-size: cover;
+        background-position: center center;
+        z-index: 0;
+        top: 9.5vh;
+        height: 60vh;
+        /* Center everything inside */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sticky-thing p {
+        padding: 6rem;
+        font-size: 8rem;
+        font-weight: 900;
+        color: #fff;
+        box-shadow: 0px 2px 2px #888888;
+      }
+
+      .step {
+        margin: 0 0rem 20rem auto;
+        background-color: #C2B8AD;
+        color: black;
+        opacity: 0.5;
+
+      }
+
+      .step:last-child {
+        margin-bottom: 0;
+      }
+
+      .step.is-active {
+        background-color: #A3CDD9;
+        color: #3b3b3b;
+        opacity: 1;
+        box-shadow: 0px 2px 4px #888888;
+      }
+
+      .step p {
+        text-align: left;
+        padding: 1rem;
+        font-size: 1.5rem;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <nav>
+        <a href="https://www.kaarnam.com">Back to homepage</a>
+        <a href="https://github.com/russellgoldenberg/scrollama">This template uses scrollama.js</a>
+        <!-- <div class="nav__examples">
+          <p>Examples:</p>
+          <a href="basic.html">Basic</a>
+          <a href="progress.html">Progress</a>
+          <a href="sticky-side.html">Sticky Side</a>
+          <a href="sticky-overlay.html">Sticky Overlay</a>
+        </div> -->
+      </nav>
+      <section id="intro">
+        <h1 class="intro__hed">Here's some spatial analysis using QGIS</h1>
+        <br>
+        <br>
+        <br>
+        <p class="intro__dek">
+          Following <a href="https://pointsunknown.nyc/qgis/2019/10/30/04_Spatial_Analysis.html">this</a> Points Unknown tutorial, I attempted to create a 10-minute walking buffer from every accessible subway station in New York City using QGIS. The objective of this analysis is to see which parts of the city require better accessibility services.
+        </p>
+        <br>
+        <br>
+        <p class="second_graf">This exercise also attempts to recreate <a href="https://www.nytimes.com/interactive/2019/02/11/nyregion/nyc-subway-access.html?smid=pl-share">this</a> New York Times story by Jugal Patel. All the city data for the exercise can be found <a href="https://pointsunknown.nyc/qgis/2019/10/30/04_Spatial_Analysis.html">here.</a></p>
+      </section>
+
+      <section id="scrolly">
+        <article>
+          <div class="step" data-step="1" data-image= "url('images/shot1.png')">
+            <p>I brought in all the necessary shapefiles- mainly the US State boundaries, NYC Census Tracts for accessibility, Hydrographic polygons and MTA Subway Stations.</p>
+          </div>
+          <div class="step" data-step="2" data-image="url('images/shot2.png')">
+            <p>I then filtered the layers to have data that exclusively refers to accessible subway stations and roads. I then used ‘Extract vertices’ to generate endpoints.</p>
+          </div>
+          <div class="step" data-step="3" data-image="url('images/shot3.png')">
+            <p>Using the vertices, I created polygons around the vertices of each subway station. The Geometry Type I used here was ‘Convex hull’. This creates the 10-min walking buffer!</p>
+          </div>
+          <div class="step" data-step="4" data-image="url('images/shot4.png')">
+            <p> In order to overlap the Census tract data and the boundary area generated in the previous step, I used ‘Dissolve’ and  ‘Union’ tools to have a resulting layer that helps analyze the estimated population outside of the buffer.</p>
+          </div>
+          <div class="step" data-step="4" data-image="url('images/shot5.png')">
+            <p>Set the color tone of the main 'CensusSplitByBuffer' layer based on the population who have disabilities. The dark color denotes a higher population living outside a 10-minute walk from an accessible station.</p>
+          </div>
+        </article>
+        <div class="sticky-thing">
+          <!-- <p>0</p> -->
+        </div>
+      </section>
+      <br>
+      <!-- <br>
+      <br>
+      <p class="conclusion">I might proceed to use Adobe Illustrator to further enhance this QGIS map, giving it a legend, a title and perhaps a scale. </p> -->
+      <section id="outro"></section>
+    </main>
+
+    <!-- <div class='debug'></div> -->
+    <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+    <script>
+      // using d3 for convenience
+      var main = document.querySelector("main");
+      var scrolly = main.querySelector("#scrolly");
+      var sticky = scrolly.querySelector(".sticky-thing");
+      var article = scrolly.querySelector("article");
+      var steps = article.querySelectorAll(".step");
+
+      // initialize the scrollama
+      var scroller = scrollama();
+
+      // scrollama event handlers
+      function handleStepEnter(response) {
+        // response = { element, direction, index }
+        var el = response.element;
+
+        // remove is-active from all steps
+        // then add is-active to this step
+        steps.forEach(step => step.classList.remove('is-active'));
+        el.classList.add('is-active');
+
+        // update graphic based on step
+        // sticky.querySelector("p").innerText = el.dataset.step;
+        sticky.style.backgroundImage = el.dataset.image;
+      }
+
+      function init() {
+        scroller
+          .setup({
+            step: "#scrolly article .step",
+            offset: 0.50,
+            debug: false
+          })
+          .onStepEnter(handleStepEnter);
+
+        // setup resize event
+        window.addEventListener("resize", scroller.resize);
+      }
+
+      // kick things off
+      init();
+    </script>
+  </body>
+</html>
